@@ -1,113 +1,135 @@
+"use client"
 import Image from "next/image";
+import CustomTextField from "./Components/CustomTextField";
+import Imagepic from "../assets/image.png";
+import { socials_styles, link_styles, Login_text } from "./CustomStyles/Styles";
+import { useState } from "react";
+import axios from "axios";
+import { Toaster, toast } from 'sonner';
+import Loader from "./Components/Loader";
+import Header from "./Components/Header";
+import * as Yup from 'yup';
+import { useFormik } from "formik";
 
-export default function Home() {
+const Login = () => {
+
+  const [loading, setloading] = useState<boolean>(false);
+
+
+  const validationSchema = Yup.object({
+    email: Yup.string().email('Invalid email address').required('Email is required'),
+    password: Yup.string().required('Password is required'),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      email: '',
+      password: '',
+    },
+    validationSchema: validationSchema,
+    onSubmit: (values) => {
+      setloading(true);
+      const payload = {
+        email: values.email,
+        password: values.password,
+        cllient: "PRIMUS"
+      }
+      axios.post("http://165.22.70.167:9100/apicore/v1/users/auth/", payload).then((response) => {
+        const data = response.data;
+        toast.success("");
+      }).catch((err) => {
+        console.log(err);
+        toast.error(err.status);
+        setloading(false);
+      })
+
+    },
+  });
+
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+    <div>
+      <Toaster richColors position="top-center" />
+      <Header />
+      <div className=" grid grid-cols-9">
+        <div className=" col-span-9 md:col-span-9 lg:col-span-4 px-4 lg:pl-20">
+          <form onSubmit={formik.handleSubmit} className=" grid place-items-center">
+            <div className=" w-full lg:w-full  md:w-[70%]  lg:h-[0px] md:h-[60%]">
+              <div>
+                <div className=" mt-6 lg:mt-12">
+                  <h1 className=" text-primary  font-bold text-xl md:text-xl lg:text-2xl">Digital</h1>
+                </div>
+                <div className=" space-y-3  mt-8 lg:mt-16">
+                  <h1 className={Login_text}>Artificial Intelligence Driving </h1>
+                  <h1 className={Login_text}>Results For The Travel Industry </h1>
+                </div>
+                <div className=" mt-6">
+                  <h1 className=" text-[#666666]">Welcome back! Please login to your account.</h1>
+                </div>
+
+                <div className=" mt-10">
+
+                  {formik.touched.email && formik.errors.email ? (
+                    <p className="text-red-500 text-sm py-2">{formik.errors.email}</p>
+                  ) : null}
+                  <CustomTextField placeholder="" value={formik.values.email}
+                    onChange={formik.handleChange}
+                    name="email"
+                    label="Email Address" />
+                  {formik.touched.password && formik.errors.password ? (
+                    <p className="text-red-500 text-sm py-2">{formik.errors.password}</p>
+                  ) : null}
+                  <CustomTextField type="password"
+                    value={formik.values.password}
+                    onChange={formik.handleChange}
+                    name="password" label="Password" />
+                </div>
+              </div>
+
+              <div className=" flex items-center justify-between pt-5">
+                <div className=" flex items-center space-x-3">
+                  <input type="checkbox" />
+                  <p className=" text-[#636363]">Remember Me</p>
+                </div>
+                <p className=" text-[#636363] cursor-pointer hover:underline">Forgot Password?</p>
+              </div>
+
+              <div className="grid place-items-center lg:flex lg:items-center lg:justify-start">
+                <div className="mt-9 space-x-5">
+                  <button type="submit" className="bg-primary text-white px-8 py-3 shadow-2xl">
+                    {loading ? <Loader /> : "Login"}
+                  </button>
+                  <button className="text-primary px-6 py-3 border border-primary">Sign Up</button>
+                </div>
+              </div>
+
+              <div className=" flex items-center justify-between mt-10">
+                <h1 className="hover:underline cursor-pointer text-secondary">Or login with</h1>
+                <h1 className={socials_styles}>Facebook</h1>
+                <h1 className={socials_styles}>LinkedIn</h1>
+                <h1 className={socials_styles}>Google</h1>
+              </div>
+            </div>
+          </form>
         </div>
+        <div className=" col-span-5 hidden md:hidden lg:block bg-[#F4F4F4] h-svh">
+          <div className=" grid place-items-center mt-12">
+            <div className=" flex items-center space-x-16">
+              <h1 className={`border-b-2 border-b-primary ${link_styles}`}>Home</h1>
+              <h1 className={link_styles}>About Us</h1>
+              <h1 className={link_styles}>Blog</h1>
+              <h1 className={link_styles}>Pricing</h1>
+            </div>
+          </div>
+          <div className=" grid place-items-center">
+            <Image priority height={400} alt="" src={Imagepic} />
+          </div>
+        </div>
+
       </div>
+    </div>
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
   );
 }
+
+export default Login
