@@ -15,6 +15,13 @@ const Login = () => {
 
   const [loading, setloading] = useState<boolean>(false);
 
+  const UserCredentials = {
+    email: "mesh.test1@gmail.com",
+    password: "test12",
+    client: "PRIMUS"
+
+  }
+
 
   const validationSchema = Yup.object({
     email: Yup.string().email('Invalid email address').required('Email is required'),
@@ -29,19 +36,24 @@ const Login = () => {
     validationSchema: validationSchema,
     onSubmit: (values) => {
       setloading(true);
-      const payload = {
-        email: values.email,
-        password: values.password,
-        cllient: "PRIMUS"
-      }
-      axios.post("http://165.22.70.167:9100/apicore/v1/users/auth/", payload).then((response) => {
-        const data = response.data;
-        toast.success("");
-      }).catch((err) => {
-        console.log(err);
-        toast.error(err.status);
+
+      if (values.email === UserCredentials.email && values.password === UserCredentials.password) {
         setloading(false);
-      })
+        toast.success("Login Successful");
+      }
+      else {
+        toast.error("Invalid Credentials");
+        setloading(false);
+      }
+      
+      // axios.post("http://165.22.70.167:9100/apicore/v1/users/auth/", payload).then((response) => {
+      //   const data = response.data;
+      //   toast.success("");
+      // }).catch((err) => {
+      //   console.log(err);
+      //   toast.error(err.status);
+      //   setloading(false);
+      // })
 
     },
   });
@@ -122,7 +134,7 @@ const Login = () => {
             </div>
           </div>
           <div className=" grid place-items-center">
-            <Image priority height={400} alt="" src={Imagepic} />
+            <Image priority height={450} alt="" src={Imagepic} />
           </div>
         </div>
 
